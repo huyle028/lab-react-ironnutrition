@@ -5,17 +5,21 @@ import 'bulma/css/bulma.css';
 import foodsFrJson from './foods.json';
 import FoodBox from './components/FoodBox'
 import { render } from '@testing-library/react';
-import Search from './components/Search'
+import Search from './components/Search';
+import AddFood from './components/AddFood';
 
 class App extends React.Component {
   state = {
     foods : foodsFrJson,
     searchText : "",
     choseFoods : [],
+    addingFood : false,
   };
 
   handleChoseFood = (chosefood) => {
-    console.log(chosefood);
+    if (chosefood.quantity<=0)
+      return;
+
     let choseFoodsCopy = [...this.state.choseFoods];
     let foodIdx = choseFoodsCopy.findIndex(el => el.name===chosefood.name);
     if (foodIdx === -1) {
@@ -38,11 +42,22 @@ class App extends React.Component {
       this.setState({foods : foodsFrJson});
   }
 
+  handleAddFood = newFood => {
+    this.setState({addingFood : false});
+    if (newFood.name === '' || newFood.image === '' || newFood.calories === '')
+      return;
+
+    let foodsCopy = [...this.state.foods];
+    foodsCopy.push(newFood);
+    this.setState({foods : foodsCopy});
+  }
+
   render (){
     return (
       <div className="App">
         <div className="container">
           <h1 className="title">IronNutrition</h1>
+          {this.state.addingFood ? <AddFood onAdd={this.handleAddFood}/> : <button onClick={() => {this.setState({addingFood : true})}}>Add Food</button>}
           <Search searchText={this.state.searchText} searchHandle={this.handleSearchText} />
           <div className="columns">
             <div className="column">
